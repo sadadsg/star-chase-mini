@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/news/news",
+    "pages/schedule/schedule",
+    "pages/events/events",
+    "pages/travel/travel"
+  ],
+  "tabBar": {
+    "color": "#B8B0C8",
+    "selectedColor": "#C084FC",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/news/news",
+        "text": "新闻",
+        "iconPath": "images/news.png",
+        "selectedIconPath": "images/news-active.png"
+      },
+      {
+        "pagePath": "pages/schedule/schedule",
+        "text": "行程",
+        "iconPath": "images/schedule.png",
+        "selectedIconPath": "images/schedule-active.png"
+      },
+      {
+        "pagePath": "pages/travel/travel",
+        "text": "出行",
+        "iconPath": "images/travel.png",
+        "selectedIconPath": "images/travel-active.png"
+      }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#C084FC",
+    "navigationBarTitleText": "嘉期如梦",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#EDE9FE"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

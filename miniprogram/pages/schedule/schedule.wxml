@@ -1,0 +1,124 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">✦ 行程日历</text>
+    <text class="page-desc">查看{{artistName}}的全部行程安排</text>
+  </view>
+
+  <!-- 月份导航 -->
+  <view class="month-nav">
+    <view class="nav-btn" bindtap="prevMonth">
+      <text class="nav-icon">‹</text>
+    </view>
+    <text class="month-title">{{year}}年 {{month}}月</text>
+    <view class="nav-btn" bindtap="nextMonth">
+      <text class="nav-icon">›</text>
+    </view>
+  </view>
+
+  <!-- 月度统计 -->
+  <view wx:if="{{monthSchedule.length > 0}}" class="month-stats">
+    <view class="stat-item" wx:if="{{stats.filming > 0}}">
+      <view class="stat-dot stat-dot-purple"></view>
+      <text class="text-purple">影视 {{stats.filming}}</text>
+    </view>
+    <view class="stat-item" wx:if="{{stats.variety > 0}}">
+      <view class="stat-dot stat-dot-green"></view>
+      <text class="text-green">综艺 {{stats.variety}}</text>
+    </view>
+    <view class="stat-item" wx:if="{{stats.business > 0}}">
+      <view class="stat-dot stat-dot-orange"></view>
+      <text class="text-orange">商务 {{stats.business}}</text>
+    </view>
+    <view class="stat-item" wx:if="{{stats.fanmeeting > 0}}">
+      <view class="stat-dot stat-dot-pink"></view>
+      <text class="text-pink">演出 {{stats.fanmeeting}}</text>
+    </view>
+    <text class="stat-total">共{{monthSchedule.length}}条</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{schedule.length === 0}}" class="card empty-state">
+    <text class="empty-icon">📅</text>
+    <text class="empty-text">暂无行程数据</text>
+    <text class="empty-sub">行程会从新闻中自动提取</text>
+  </view>
+
+  <!-- 日历 -->
+  <view wx:else class="calendar">
+    <!-- 星期头 -->
+    <view class="weekday-header">
+      <text class="weekday-item" wx:for="{{weekdays}}" wx:key="index">{{item}}</text>
+    </view>
+
+    <!-- 日历格子 -->
+    <view class="calendar-grid">
+      <view class="calendar-day {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isEmpty ? 'empty' : ''}} {{item.events.length > 0 ? 'has-events' : ''}}" 
+            wx:for="{{calendarDays}}" 
+            wx:key="index"
+            bindtap="selectDay"
+            data-day="{{item.day}}"
+            data-date="{{item.date}}">
+        <text class="day-number" wx:if="{{!item.isEmpty}}">{{item.day}}</text>
+        <view class="day-events" wx:if="{{item.events.length > 0}}">
+          <view class="event-dot {{event.dotClass}}" wx:for="{{item.events}}" wx:for-item="event" wx:key="id"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选中日期的行程详情 -->
+  <view wx:if="{{selectedDate && selectedSchedule.length > 0}}" class="selected-schedule">
+    <view class="selected-date-title">
+      <text class="selected-date-icon">📅</text>
+      <text>{{selectedDate}} 的行程</text>
+    </view>
+    <view class="schedule-detail" wx:for="{{selectedSchedule}}" wx:key="id">
+      <view class="detail-header">
+        <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+        <text class="detail-time">🕐 {{item.time}}</text>
+      </view>
+      <text class="detail-title">{{item.title}}</text>
+      <text class="detail-desc">{{item.description}}</text>
+      <view class="detail-footer">
+        <text class="detail-location">
+          <text class="location-icon">📍</text>
+          {{item.location}}
+        </text>
+        <view wx:if="{{item.newsUrl}}" class="detail-link" bindtap="copyLink" data-url="{{item.newsUrl}}">
+          <text class="link-icon">🔗</text>
+          <text>查看来源</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{selectedDate && selectedSchedule.length === 0}}" class="no-schedule">
+    <text class="no-schedule-icon">📭</text>
+    <text class="no-schedule-text">这天暂无行程安排</text>
+  </view>
+
+  <!-- 图例 -->
+  <view wx:if="{{schedule.length > 0}}" class="legend">
+    <view class="legend-item">
+      <view class="legend-dot dot-purple"></view>
+      <text class="legend-text">影视拍摄</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-dot dot-green"></view>
+      <text class="legend-text">综艺录制</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-dot dot-orange"></view>
+      <text class="legend-text">商务活动</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-dot dot-pink"></view>
+      <text class="legend-text">演出活动</text>
+    </view>
+  </view>
+</view>

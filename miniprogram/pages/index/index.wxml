@@ -1,0 +1,101 @@
+<view class="container">
+  <!-- Hero Banner -->
+  <view class="hero-banner">
+    <image src="/images/banner.jpg" mode="aspectFill" class="banner-image" />
+    <view class="banner-overlay">
+      <text class="banner-title">{{siteName}}</text>
+      <text class="banner-subtitle">{{artistName}}粉丝站</text>
+    </view>
+    <text class="banner-decoration">✦</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-number">{{scheduleCount}}</text>
+      <text class="stat-label">近期行程</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{newsCount}}</text>
+      <text class="stat-label">相关新闻</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{eventCount}}</text>
+      <text class="stat-label">活动门票</text>
+    </view>
+  </view>
+
+  <!-- 近期行程 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">✦ 近期行程</text>
+      <text class="section-link" bindtap="goToSchedule">查看全部</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <view class="loading-spinner"></view>
+    </view>
+
+    <view wx:elif="{{schedule.length === 0}}" class="card empty-state">
+      <text class="empty-icon">📅</text>
+      <text class="empty-text">暂无近期行程</text>
+      <text class="empty-sub">行程会从新闻中自动提取</text>
+    </view>
+
+    <view wx:else class="schedule-list">
+      <view class="schedule-item" wx:for="{{schedule}}" wx:key="id" bindtap="goToScheduleDetail" data-id="{{item.id}}">
+        <view class="schedule-date">
+          <text class="date-day">{{item.day}}</text>
+          <text class="date-month">{{item.month}}月</text>
+        </view>
+        <view class="schedule-dot {{item.dotClass}}"></view>
+        <view class="schedule-info">
+          <view class="schedule-meta">
+            <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+          </view>
+          <text class="schedule-title">{{item.title}}</text>
+          <text class="schedule-location">{{item.location}} · {{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最新资讯 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">✦ 最新资讯</text>
+      <text class="section-link" bindtap="goToNews">查看全部</text>
+    </view>
+
+    <view wx:if="{{newsLoading}}" class="loading">
+      <view class="loading-spinner"></view>
+    </view>
+
+    <view wx:elif="{{news.length === 0}}" class="card empty-state">
+      <text class="empty-icon">📰</text>
+      <text class="empty-text">暂无相关新闻</text>
+    </view>
+
+    <view wx:else class="news-list">
+      <view class="news-item" wx:for="{{news}}" wx:key="index" bindtap="openNews" data-url="{{item.url}}">
+        <view class="news-icon">📰</view>
+        <view class="news-content">
+          <text class="news-title">{{item.title}}</text>
+          <view class="news-meta">
+            <text class="news-source">{{item.source}}</text>
+            <text class="news-time">{{item.time}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 出行推荐入口 -->
+  <view class="section">
+    <view class="travel-banner" bindtap="goToTravel">
+      <text class="travel-title">✈ 出行推荐</text>
+      <text class="travel-desc">输入出发城市，自动匹配去爱豆活动的机票和高铁</text>
+      <view class="btn-primary travel-btn">查看出行方案</view>
+    </view>
+  </view>
+</view>

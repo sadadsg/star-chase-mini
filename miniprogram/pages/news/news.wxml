@@ -1,0 +1,57 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">✦ 新闻资讯</text>
+    <text class="page-desc">实时追踪{{artistName}}相关新闻</text>
+  </view>
+
+  <!-- 数据来源说明 -->
+  <view class="source-bar">
+    <view class="source-info">
+      <view class="source-dot"></view>
+      <text class="source-text">来源：今日头条 / 百度热搜</text>
+    </view>
+    <view class="refresh-btn" bindtap="refreshNews">
+      <text class="refresh-icon">↻</text>
+      <text>刷新</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{news.length === 0}}" class="card empty-state">
+    <text class="empty-icon">📰</text>
+    <text class="empty-text">暂无相关新闻</text>
+    <text class="empty-sub">新闻会从实时热搜中自动获取</text>
+    <view class="btn-primary empty-btn" bindtap="refreshNews">刷新试试</view>
+  </view>
+
+  <!-- 新闻列表 -->
+  <view wx:else class="news-list">
+    <view class="news-item" wx:for="{{news}}" wx:key="index" bindtap="openNews" data-url="{{item.url}}">
+      <view class="news-content">
+        <text class="news-title">{{item.title}}</text>
+        <text class="news-summary" wx:if="{{item.summary && item.summary !== item.title}}">{{item.summary}}</text>
+        <view class="news-meta">
+          <view class="news-tags">
+            <text class="badge badge-purple" wx:if="{{item.category}}">{{item.category}}</text>
+            <text class="news-source">{{item.source}}</text>
+          </view>
+          <text class="news-time">{{item.time}}</text>
+        </view>
+      </view>
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="news-cover" />
+    </view>
+  </view>
+
+  <!-- 提示 -->
+  <view wx:if="{{!loading && news.length > 0}}" class="tips">
+    <text class="tips-text">
+      <text class="tips-icon">✦</text>
+      共 {{total}} 条相关新闻，点击可复制链接
+    </text>
+  </view>
+</view>

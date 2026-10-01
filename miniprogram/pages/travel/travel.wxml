@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">✦ 出行推荐</text>
+    <text class="page-desc">输入出发城市，自动匹配去爱豆活动的机票和高铁</text>
+  </view>
+
+  <!-- 步骤 1：选择活动 -->
+  <view class="step">
+    <view class="step-header">
+      <view class="step-number">1</view>
+      <text class="step-title">选择你想参加的活动</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <view class="loading-spinner"></view>
+    </view>
+
+    <view wx:elif="{{events.length === 0}}" class="empty-state">
+      <text class="empty-icon">📅</text>
+      <text class="empty-text">暂无活动数据</text>
+      <text class="empty-sub">活动信息会从新闻中自动提取</text>
+    </view>
+
+    <view wx:else class="event-grid">
+      <view class="event-option {{selectedEvent === index ? 'selected' : ''}}" 
+            wx:for="{{events}}" 
+            wx:key="id"
+            bindtap="selectEvent"
+            data-index="{{index}}">
+        <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+        <text class="event-date">{{item.date}}</text>
+        <text class="event-name">{{item.title}}</text>
+        <view class="event-location">
+          <text>📍</text>
+          <text>{{item.location}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤 2：选择出发城市 -->
+  <view wx:if="{{activeEvent}}" class="step">
+    <view class="step-header">
+      <view class="step-number">2</view>
+      <text class="step-title">选择你的出发城市</text>
+    </view>
+    <text class="step-desc">目的地：<text class="text-primary">{{activeEvent.city || activeEvent.location}}</text></text>
+    <picker bindchange="onCityChange" value="{{cityIndex}}" range="{{cities}}">
+      <view class="city-picker">
+        <text class="city-text">{{fromCity}}</text>
+        <text class="picker-icon">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 出行方案 -->
+  <view wx:if="{{activeEvent && showRoutes}}" class="routes">
+    <view class="route-header">
+      <text class="route-title">{{fromCity}} → {{activeEvent.city || activeEvent.location}}</text>
+      <text class="route-subtitle">{{activeEvent.title}}</text>
+      <view class="route-date">
+        <text>📅</text>
+        <text>{{activeEvent.date}}</text>
+      </view>
+    </view>
+
+    <text class="route-section-title">✦ 出行方案</text>
+
+    <view class="route-list">
+      <a class="route-item" href="{{flightUrl}}">
+        <view class="route-icon route-icon-purple">✈</view>
+        <view class="route-info">
+          <text class="route-name">携程 · 查看航班</text>
+          <text class="route-desc">{{fromCity}}→{{activeEvent.city || activeEvent.location}} 直达/中转航班</text>
+        </view>
+        <text class="route-arrow">›</text>
+      </a>
+
+      <a class="route-item" href="{{trainUrl}}">
+        <view class="route-icon route-icon-pink">🚄</view>
+        <view class="route-info">
+          <text class="route-name">12306 · 查看车次</text>
+          <text class="route-desc">{{fromCity}}→{{activeEvent.city || activeEvent.location}} 高铁/动车</text>
+        </view>
+        <text class="route-arrow">›</text>
+      </a>
+    </view>
+  </view>
+
+  <!-- 本地活动提示 -->
+  <view wx:if="{{activeEvent && isLocal}}" class="local-tip">
+    <view class="local-icon">✓</view>
+    <text class="local-title">活动就在你的城市！</text>
+    <text class="local-desc">无需出行，直接去现场就行啦</text>
+  </view>
+</view>
