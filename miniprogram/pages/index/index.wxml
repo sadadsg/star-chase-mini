@@ -1,35 +1,31 @@
 <view class="container">
-  <!-- Hero Banner -->
-  <view class="hero-banner">
-    <image src="/images/banner.jpg" mode="aspectFill" class="banner-image" />
-    <view class="banner-overlay">
-      <text class="banner-title">{{siteName}}</text>
-      <text class="banner-subtitle">{{artistName}}粉丝站</text>
-    </view>
-    <text class="banner-decoration">✦</text>
+  <view class="hero">
+    <text class="hero-date">{{today}}</text>
+    <text class="hero-title">{{siteName}}</text>
+    <text class="hero-sub">{{artistName}} · {{tagline}}</text>
   </view>
 
-  <!-- 统计卡片 -->
-  <view class="stats-card">
-    <view class="stat-item">
-      <text class="stat-number">{{scheduleCount}}</text>
-      <text class="stat-label">近期行程</text>
+  <view class="stats-row card-tinted">
+    <view class="stat">
+      <text class="stat-num">{{upcomingCount}}</text>
+      <text class="stat-label">未来行程</text>
     </view>
-    <view class="stat-item">
-      <text class="stat-number">{{newsCount}}</text>
-      <text class="stat-label">相关新闻</text>
+    <view class="stat-divider"></view>
+    <view class="stat">
+      <text class="stat-num">{{newsCount}}</text>
+      <text class="stat-label">官方动态</text>
     </view>
-    <view class="stat-item">
-      <text class="stat-number">{{eventCount}}</text>
+    <view class="stat-divider"></view>
+    <view class="stat">
+      <text class="stat-num">{{eventsCount}}</text>
       <text class="stat-label">活动门票</text>
     </view>
   </view>
 
-  <!-- 近期行程 -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">✦ 近期行程</text>
-      <text class="section-link" bindtap="goToSchedule">查看全部</text>
+      <text class="section-title">近期行程</text>
+      <text class="section-link" bindtap="goToSchedule" wx:if="{{schedule.length}}">全部 ›</text>
     </view>
 
     <view wx:if="{{loading}}" class="loading">
@@ -38,33 +34,36 @@
 
     <view wx:elif="{{schedule.length === 0}}" class="card empty-state">
       <text class="empty-icon">📅</text>
-      <text class="empty-text">暂无近期行程</text>
-      <text class="empty-sub">行程会从新闻中自动提取</text>
+      <text class="empty-text">{{loadFailed ? '数据加载失败' : '暂无行程数据'}}</text>
+      <text class="empty-sub">{{loadFailed ? '请检查网络后下拉刷新' : '下拉刷新试试，或稍后再来看看'}}</text>
     </view>
 
-    <view wx:else class="schedule-list">
-      <view class="schedule-item" wx:for="{{schedule}}" wx:key="id" bindtap="goToScheduleDetail" data-id="{{item.id}}">
-        <view class="schedule-date">
-          <text class="date-day">{{item.day}}</text>
-          <text class="date-month">{{item.month}}月</text>
-        </view>
-        <view class="schedule-dot {{item.dotClass}}"></view>
-        <view class="schedule-info">
-          <view class="schedule-meta">
-            <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+    <block wx:else>
+      <text wx:if="{{recentNote}}" class="recent-note">{{recentNote}}</text>
+      <view class="schedule-list">
+        <view class="schedule-item" wx:for="{{schedule}}" wx:key="key">
+          <view class="schedule-date">
+            <text class="date-day">{{item.day}}</text>
+            <text class="date-month">{{item.month}}月 {{item.weekday}}</text>
           </view>
-          <text class="schedule-title">{{item.title}}</text>
-          <text class="schedule-location">{{item.location}} · {{item.time}}</text>
+          <view class="schedule-body">
+            <view class="schedule-meta">
+              <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+              <text class="meta-time" wx:if="{{!item.isAllDay}}">{{item.time}}</text>
+              <text class="meta-city">{{item.city}}</text>
+            </view>
+            <text class="schedule-title">{{item.title}}</text>
+            <text class="schedule-source" wx:if="{{item.source}}">来源：{{item.source}}</text>
+          </view>
         </view>
       </view>
-    </view>
+    </block>
   </view>
 
-  <!-- 最新资讯 -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">✦ 最新资讯</text>
-      <text class="section-link" bindtap="goToNews">查看全部</text>
+      <text class="section-title">最新动态</text>
+      <text class="section-link" bindtap="goToNews">全部 ›</text>
     </view>
 
     <view wx:if="{{newsLoading}}" class="loading">
@@ -73,29 +72,48 @@
 
     <view wx:elif="{{news.length === 0}}" class="card empty-state">
       <text class="empty-icon">📰</text>
-      <text class="empty-text">暂无相关新闻</text>
+      <text class="empty-text">暂无动态</text>
     </view>
 
     <view wx:else class="news-list">
-      <view class="news-item" wx:for="{{news}}" wx:key="index" bindtap="openNews" data-url="{{item.url}}">
-        <view class="news-icon">📰</view>
-        <view class="news-content">
-          <text class="news-title">{{item.title}}</text>
-          <view class="news-meta">
-            <text class="news-source">{{item.source}}</text>
-            <text class="news-time">{{item.time}}</text>
-          </view>
+      <view class="news-item" wx:for="{{news}}" wx:key="key" bindtap="copyLink" data-url="{{item.url}}">
+        <view class="news-tags">
+          <text wx:if="{{item.isOfficial}}" class="badge-official">官方</text>
+          <text class="news-source">{{item.source}}</text>
         </view>
+        <text class="news-title">{{item.title}}</text>
+        <text class="news-time">{{item.time}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 出行推荐入口 -->
   <view class="section">
-    <view class="travel-banner" bindtap="goToTravel">
-      <text class="travel-title">✈ 出行推荐</text>
-      <text class="travel-desc">输入出发城市，自动匹配去爱豆活动的机票和高铁</text>
-      <view class="btn-primary travel-btn">查看出行方案</view>
+    <view class="section-header">
+      <text class="section-title">快捷入口</text>
     </view>
+    <view class="grid-nav">
+      <view class="grid-cell card" bindtap="goToSchedule">
+        <text class="grid-title">行程日历</text>
+        <text class="grid-desc">按月浏览公开安排</text>
+      </view>
+      <view class="grid-cell card" bindtap="goToNews">
+        <text class="grid-title">动态资讯</text>
+        <text class="grid-desc">官方与合作账号动态</text>
+      </view>
+      <view class="grid-cell card" bindtap="goToEvents">
+        <text class="grid-title">活动门票</text>
+        <text class="grid-desc">演出与活动汇总</text>
+      </view>
+      <view class="grid-cell card" bindtap="goToTravel">
+        <text class="grid-title">出行参考</text>
+        <text class="grid-desc">按城市生成购票链接</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <text class="footer-note">内容均来自官方公开渠道的聚合整理，不包含任何非公开行程信息</text>
+    <text wx:if="{{dataSourceLabel}}" class="footer-source">当前数据：{{dataSourceLabel}}</text>
+    <button class="feedback-btn" open-type="feedback">意见反馈</button>
   </view>
 </view>

@@ -9,6 +9,11 @@ function formatDate(date) {
   return `${year}-${month}-${day}`
 }
 
+// 今天的 YYYY-MM-DD
+function todayStr() {
+  return formatDate(new Date())
+}
+
 // 获取日期信息
 function getDateInfo(dateStr) {
   const d = new Date(dateStr)
@@ -22,25 +27,42 @@ function getDateInfo(dateStr) {
   }
 }
 
-// 类型映射
+// 行程类型映射（色板与 Web DESIGN-DOC v2.0 同源：降饱和、白底可读）
 const typeMap = {
-  filming: { label: '影视拍摄', color: '#7C3AED', bg: 'rgba(139,92,246,0.1)' },
-  variety: { label: '综艺录制', color: '#059669', bg: 'rgba(16,185,129,0.1)' },
-  business: { label: '商务活动', color: '#D97706', bg: 'rgba(245,158,11,0.1)' },
-  fanmeeting: { label: '演出活动', color: '#DB2777', bg: 'rgba(236,72,153,0.1)' }
+  filming: { label: '影视拍摄', color: '#5856d6', bg: 'rgba(88,86,214,0.10)' },
+  variety: { label: '综艺录制', color: '#248a3d', bg: 'rgba(36,138,61,0.10)' },
+  business: { label: '商务活动', color: '#b45309', bg: 'rgba(180,83,9,0.10)' },
+  fanmeeting: { label: '演出活动', color: '#d6336c', bg: 'rgba(214,51,108,0.10)' }
 }
 
-// 获取类型信息
+// 获取类型信息；未知类型按「公开动态」灰档处理，不强行归为商务
 function getTypeInfo(type) {
-  return typeMap[type] || typeMap.business
+  return typeMap[type] || { label: '公开动态', color: '#6e6e73', bg: 'rgba(110,110,115,0.10)' }
 }
 
-// 城市列表
-const CITIES = [
-  '北京', '上海', '广州', '深圳', '成都', '杭州', '南京', '武汉',
-  '重庆', '西安', '长沙', '天津', '苏州', '青岛', '大连', '郑州',
-  '昆明', '厦门', '福州', '合肥'
-]
+// 徽章/圆点样式类（wxss 中定义 .badge-filming 等四档 + .badge-default）
+function typeClasses(type) {
+  const known = ['filming', 'variety', 'business', 'fanmeeting']
+  const t = known.indexOf(type) >= 0 ? type : 'default'
+  return { badgeClass: `badge-${t}`, dotClass: `dot-${t}` }
+}
+
+// 城市归一化：与 Web src/lib/travel-links.js 同源。数据管道用「待定」表示城市未知
+function normalizeCity(city) {
+  if (typeof city !== 'string') return null
+  const trimmed = city.trim()
+  if (!trimmed || trimmed === '待定') return null
+  return trimmed
+}
+
+function cityText(city) {
+  return normalizeCity(city) || '城市待定'
+}
+
+// 时刻展示：空值统一为「全天」
+function timeText(time) {
+  return (time && time !== '全天') ? time : '全天'
+}
 
 // 城市 → 12306 车站代码
 const stationCodes = {
@@ -60,12 +82,47 @@ const flightCodes = {
   '昆明': 'KMG', '厦门': 'XMN', '福州': 'FOC', '合肥': 'HFE'
 }
 
+// 携程机票链接：两端城市缺码或日期缺失时返回 ''（不产出死链）
+function buildCtripFlightUrl(from, to, date) {
+  const f = flightCodes[normalizeCity(from)]
+  const t = flightCodes[normalizeCity(to)]
+  if (!f || !t || !date) return ''
+  return `https://flights.ctrip.com/online/list/oneway-${f}-${t}?depdate=${date}`
+}
+
+// 12306 车次链接：两端缺站码或日期缺失时返回 ''
+function buildTrain12306Url(from, to, date) {
+  const f = stationCodes[normalizeCity(from)]
+  const t = stationCodes[normalizeCity(to)]
+  if (!f || !t || !date) return ''
+  return `https://kyfw.12306.cn/otn/leftTicket/init?leftTicketDTO.train_date=${date}` +
+    `&leftTicketDTO.from_station=${f}&leftTicketDTO.to_station=${t}&purpose_codes=ADULT`
+}
+
+// 复制文本 + 成功提示
+function copyText(text, toastTitle) {
+  if (!text) return
+  wx.setClipboardData({
+    data: text,
+    success() {
+      wx.showToast({ title: toastTitle || '已复制', icon: 'success' })
+    }
+  })
+}
+
 module.exports = {
   formatDate,
+  todayStr,
   getDateInfo,
   getTypeInfo,
+  typeClasses,
   typeMap,
-  CITIES,
+  normalizeCity,
+  cityText,
+  timeText,
   stationCodes,
-  flightCodes
+  flightCodes,
+  buildCtripFlightUrl,
+  buildTrain12306Url,
+  copyText
 }

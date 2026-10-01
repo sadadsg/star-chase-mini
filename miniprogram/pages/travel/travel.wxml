@@ -1,10 +1,9 @@
 <view class="container">
   <view class="page-header">
-    <text class="page-title">✦ 出行推荐</text>
-    <text class="page-desc">输入出发城市，自动匹配去爱豆活动的机票和高铁</text>
+    <text class="page-title">出行参考</text>
+    <text class="page-desc">选择活动与出发城市，生成购票查询链接</text>
   </view>
 
-  <!-- 步骤 1：选择活动 -->
   <view class="step">
     <view class="step-header">
       <view class="step-number">1</view>
@@ -17,80 +16,77 @@
 
     <view wx:elif="{{events.length === 0}}" class="empty-state">
       <text class="empty-icon">📅</text>
-      <text class="empty-text">暂无活动数据</text>
-      <text class="empty-sub">活动信息会从新闻中自动提取</text>
+      <text class="empty-text">{{loadFailed ? '数据加载失败' : '暂无活动数据'}}</text>
+      <text class="empty-sub" wx:if="{{!loadFailed}}">活动信息从官方公开动态中自动提取</text>
     </view>
 
     <view wx:else class="event-grid">
-      <view class="event-option {{selectedEvent === index ? 'selected' : ''}}" 
-            wx:for="{{events}}" 
-            wx:key="id"
-            bindtap="selectEvent"
-            data-index="{{index}}">
-        <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
-        <text class="event-date">{{item.date}}</text>
-        <text class="event-name">{{item.title}}</text>
-        <view class="event-location">
-          <text>📍</text>
-          <text>{{item.location}}</text>
+      <view
+        wx:for="{{events}}"
+        wx:key="key"
+        class="event-option card {{selectedEvent === index ? 'selected' : ''}}"
+        bindtap="selectEvent"
+        data-index="{{index}}">
+        <view class="event-option-top">
+          <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+          <text class="event-option-date" wx:if="{{item.date}}">{{item.date}}</text>
         </view>
+        <text class="event-option-name">{{item.title}}</text>
+        <text class="event-option-city">📍 {{item.city}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 步骤 2：选择出发城市 -->
   <view wx:if="{{activeEvent}}" class="step">
     <view class="step-header">
       <view class="step-number">2</view>
       <text class="step-title">选择你的出发城市</text>
     </view>
-    <text class="step-desc">目的地：<text class="text-primary">{{activeEvent.city || activeEvent.location}}</text></text>
+    <text class="step-desc">目的地：<text class="text-strong">{{activeEvent.city}}</text></text>
     <picker bindchange="onCityChange" value="{{cityIndex}}" range="{{cities}}">
       <view class="city-picker">
         <text class="city-text">{{fromCity}}</text>
-        <text class="picker-icon">▼</text>
+        <text class="picker-icon">▾</text>
       </view>
     </picker>
   </view>
 
-  <!-- 出行方案 -->
-  <view wx:if="{{activeEvent && showRoutes}}" class="routes">
-    <view class="route-header">
-      <text class="route-title">{{fromCity}} → {{activeEvent.city || activeEvent.location}}</text>
-      <text class="route-subtitle">{{activeEvent.title}}</text>
-      <view class="route-date">
-        <text>📅</text>
-        <text>{{activeEvent.date}}</text>
-      </view>
+  <view wx:if="{{activeEvent && showRoutes}}" class="step">
+    <view class="step-header">
+      <view class="step-number">3</view>
+      <text class="step-title">{{fromCity}} → {{activeEvent.city}}</text>
     </view>
-
-    <text class="route-section-title">✦ 出行方案</text>
+    <text class="step-desc" wx:if="{{activeEvent.date}}">出发日期建议：{{activeEvent.date}}</text>
 
     <view class="route-list">
-      <a class="route-item" href="{{flightUrl}}">
-        <view class="route-icon route-icon-purple">✈</view>
+      <view class="route-item card" bindtap="copyRoute" data-type="flight">
         <view class="route-info">
-          <text class="route-name">携程 · 查看航班</text>
-          <text class="route-desc">{{fromCity}}→{{activeEvent.city || activeEvent.location}} 直达/中转航班</text>
+          <text class="route-name">携程 · 机票查询</text>
+          <text class="route-desc">{{fromCity}} → {{activeEvent.city}} 直达/中转航班</text>
         </view>
-        <text class="route-arrow">›</text>
-      </a>
+        <text class="route-action">复制链接</text>
+      </view>
 
-      <a class="route-item" href="{{trainUrl}}">
-        <view class="route-icon route-icon-pink">🚄</view>
+      <view class="route-item card" bindtap="copyRoute" data-type="train">
         <view class="route-info">
-          <text class="route-name">12306 · 查看车次</text>
-          <text class="route-desc">{{fromCity}}→{{activeEvent.city || activeEvent.location}} 高铁/动车</text>
+          <text class="route-name">12306 · 车次查询</text>
+          <text class="route-desc">{{fromCity}} → {{activeEvent.city}} 高铁/动车</text>
         </view>
-        <text class="route-arrow">›</text>
-      </a>
+        <text class="route-action">复制链接</text>
+      </view>
     </view>
+    <text class="route-tip">小程序内无法直接打开外部网页，复制链接后在浏览器打开即可购票查询</text>
   </view>
 
-  <!-- 本地活动提示 -->
-  <view wx:if="{{activeEvent && isLocal}}" class="local-tip">
-    <view class="local-icon">✓</view>
-    <text class="local-title">活动就在你的城市！</text>
-    <text class="local-desc">无需出行，直接去现场就行啦</text>
+  <view wx:if="{{activeEvent && isLocal}}" class="local-tip card card-tinted">
+    <text class="local-title">活动就在{{fromCity}}</text>
+    <text class="local-desc">无需跨城出行，按公开信息的时间地点前往即可</text>
   </view>
+
+  <view wx:if="{{activeEvent && !hasDestination}}" class="local-tip card card-tinted">
+    <text class="local-title">目的地待定</text>
+    <text class="local-desc">该动态暂未公布城市，官方公布后即可生成购票查询链接</text>
+  </view>
+
+  <view class="source-note">购票以官方渠道为准，本工具仅生成查询链接{{dataSourceLabel ? ' · ' + dataSourceLabel : ''}}</view>
 </view>

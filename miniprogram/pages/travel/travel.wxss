@@ -1,337 +1,176 @@
-/* 出行推荐页面样式 - 液态玻璃风格 */
+/* 出行参考 — Apple 式极简 */
 
-.page-header {
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-md);
-}
-
-.page-title {
-  display: block;
-  font-size: 40rpx;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 2rpx;
-}
-
-.page-desc {
-  display: block;
-  font-size: 26rpx;
-  color: var(--text-tertiary);
-  margin-top: 8rpx;
-}
-
-/* 步骤 */
 .step {
-  margin-bottom: var(--space-lg);
-  padding: var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
+  margin-top: 32rpx;
 }
 
 .step-header {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  margin-bottom: 20rpx;
 }
 
 .step-number {
-  width: 56rpx;
-  height: 56rpx;
+  width: 40rpx;
+  height: 40rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: var(--text-white);
-  font-size: 28rpx;
-  font-weight: 700;
+  background: var(--btn);
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 16rpx rgba(168, 85, 247, 0.3);
+  margin-right: 16rpx;
 }
 
 .step-title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .step-desc {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-lg);
-  line-height: 1.6;
+  display: block;
+  margin-bottom: 16rpx;
+  font-size: 24rpx;
+  color: var(--text-2);
 }
 
-/* 活动选项 */
+.text-strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* 活动选择 */
 .event-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
 
 .event-option {
-  padding: var(--space-md);
-  border: 1rpx solid var(--border);
-  border-radius: var(--radius-xl);
-  text-align: left;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.3);
+  padding: 26rpx 30rpx;
+  border-radius: 20rpx;
 }
 
 .event-option.selected {
-  background: var(--primary);
-  border-color: var(--primary);
-  box-shadow: 0 4rpx 16rpx rgba(168, 85, 247, 0.3);
+  border-color: var(--btn);
+  box-shadow: 0 0 0 2rpx rgba(0, 113, 227, 0.25);
 }
 
-.event-option.selected .event-date,
-.event-option.selected .event-name,
-.event-option.selected .event-location {
-  color: var(--text-white);
-}
-
-.event-option.selected .badge {
-  background: rgba(255,255,255,0.2);
-  color: var(--text-white);
-}
-
-.event-date {
-  display: block;
-  font-size: 22rpx;
-  color: var(--text-tertiary);
-  margin-top: 12rpx;
-}
-
-.event-name {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 8rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.event-location {
+.event-option-top {
   display: flex;
   align-items: center;
-  gap: 4rpx;
-  font-size: 22rpx;
-  color: var(--text-tertiary);
-  margin-top: 8rpx;
+  justify-content: space-between;
 }
 
-/* 城市选择器 */
+.event-option-date {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--link);
+}
+
+.event-option-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.event-option-city {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* 城市选择 */
 .city-picker {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--space-md) var(--space-lg);
-  background: rgba(255,255,255,0.4);
-  border: 1rpx solid var(--border);
-  border-radius: var(--radius-xl);
-  transition: all 0.2s ease;
-}
-
-.city-picker:active {
-  border-color: var(--primary);
-  background: rgba(168, 85, 247, 0.08);
+  justify-content: space-between;
+  background: var(--surface);
+  border-radius: 16rpx;
+  padding: 26rpx 32rpx;
 }
 
 .city-text {
   font-size: 30rpx;
-  color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .picker-icon {
-  font-size: 24rpx;
-  color: var(--text-tertiary);
-}
-
-/* 出行方案 */
-.routes {
-  padding: 0;
-  overflow: hidden;
-  margin-bottom: var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-}
-
-.route-header {
-  background: rgba(168,85,247,0.06);
-  padding: var(--space-xl);
-}
-
-.route-title {
-  display: block;
-  font-size: 36rpx;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 2rpx;
-}
-
-.route-subtitle {
-  display: block;
   font-size: 26rpx;
-  color: var(--text-secondary);
-  margin-top: 8rpx;
+  color: var(--text-3);
 }
 
-.route-date {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  margin-top: var(--space-sm);
-  font-size: 24rpx;
-  color: var(--primary);
-  font-weight: 500;
-}
-
-.route-section-title {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-  padding: var(--space-lg) var(--space-lg) var(--space-sm);
-}
-
+/* 路线 */
 .route-list {
-  padding: 0 var(--space-lg) var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 16rpx;
 }
 
 .route-item {
   display: flex;
   align-items: center;
-  padding: var(--space-lg);
-  border: 1rpx solid var(--border);
-  border-radius: var(--radius-xl);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.3);
-}
-
-.route-item:active {
-  transform: scale(0.98);
-  border-color: var(--primary);
-  background: rgba(168, 85, 247, 0.08);
-}
-
-.route-icon {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32rpx;
-  margin-right: var(--space-md);
-  flex-shrink: 0;
-}
-
-.route-icon-purple {
-  background: rgba(168, 85, 247, 0.1);
-}
-
-.route-icon-pink {
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.route-info {
-  flex: 1;
+  justify-content: space-between;
+  padding: 28rpx 30rpx;
 }
 
 .route-name {
   display: block;
   font-size: 28rpx;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .route-desc {
   display: block;
-  font-size: 24rpx;
-  color: var(--text-tertiary);
   margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
 }
 
-.route-arrow {
-  font-size: 36rpx;
-  color: var(--text-tertiary);
+.route-action {
   flex-shrink: 0;
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: var(--link);
 }
 
-/* 本地活动提示 */
+.route-tip {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+
+/* 提示卡 */
 .local-tip {
-  text-align: center;
-  padding: var(--space-xl);
-  margin-bottom: var(--space-lg);
-  background: rgba(16, 185, 129, 0.06);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-}
-
-.local-icon {
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  background: var(--success);
-  color: var(--text-white);
-  font-size: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--space-md);
-  box-shadow: 0 8rpx 24rpx rgba(52, 211, 153, 0.3);
+  margin-top: 32rpx;
+  padding: 30rpx 32rpx;
+  border-radius: 20rpx;
 }
 
 .local-title {
   display: block;
-  font-size: 36rpx;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .local-desc {
   display: block;
-  font-size: 28rpx;
-  color: var(--text-secondary);
-}
-
-/* 空状态 */
-.empty-state {
-  background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(96,165,250,0.04));
-  border: 1rpx dashed var(--border);
-  padding: var(--space-xl);
-}
-
-.empty-icon {
-  font-size: 100rpx;
-  margin-bottom: var(--space-md);
-  display: block;
-  opacity: 0.5;
-}
-
-.empty-text {
-  font-size: 32rpx;
-  color: var(--text-secondary);
-  font-weight: 600;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.empty-sub {
-  font-size: 26rpx;
-  color: var(--text-tertiary);
-  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-2);
+  line-height: 1.6;
 }

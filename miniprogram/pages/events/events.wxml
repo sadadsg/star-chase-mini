@@ -1,50 +1,44 @@
 <view class="container">
   <view class="page-header">
-    <text class="page-title">✦ 活动门票</text>
-    <text class="page-desc">查看{{artistName}}相关活动信息</text>
+    <text class="page-title">活动门票</text>
+    <text class="page-desc">{{artistName}}相关演出与活动汇总</text>
   </view>
 
-  <!-- 加载状态 -->
   <view wx:if="{{loading}}" class="loading">
     <view class="loading-spinner"></view>
   </view>
 
-  <!-- 空状态 -->
   <view wx:elif="{{events.length === 0}}" class="card empty-state">
     <text class="empty-icon">🎫</text>
-    <text class="empty-text">暂无活动</text>
-    <text class="empty-sub">活动信息会从新闻中自动提取</text>
+    <text class="empty-text">{{loadFailed ? '数据加载失败' : '暂无活动'}}</text>
+    <text class="empty-sub" wx:if="{{!loadFailed}}">活动信息从官方公开动态中自动提取</text>
   </view>
 
-  <!-- 活动列表 -->
   <view wx:else class="events-list">
-    <view class="event-card" wx:for="{{events}}" wx:key="id">
-      <view class="event-cover-wrapper">
-        <image src="{{item.cover}}" mode="aspectFill" class="event-cover" />
-        <view class="event-cover-overlay"></view>
-        <text class="event-badge badge-onsale">{{item.statusText}}</text>
+    <view class="event-card" wx:for="{{events}}" wx:key="key">
+      <view class="event-top">
+        <text class="badge {{item.badgeClass}}">{{item.typeName}}</text>
+        <text class="event-date" wx:if="{{item.dateText}}">{{item.dateText}}</text>
       </view>
-      <view class="event-content">
-        <view class="event-header">
-          <text class="event-title">{{item.name}}</text>
+      <text class="event-name">{{item.name}}</text>
+      <view class="event-meta">
+        <view class="meta-row">
+          <text class="meta-label">城市</text>
+          <text class="meta-value">{{item.city}}</text>
         </view>
-        <view class="event-meta">
-          <view class="meta-item">
-            <view class="meta-icon meta-icon-purple">📅</view>
-            <text class="meta-text">{{item.date}}</text>
-          </view>
-          <view class="meta-item">
-            <view class="meta-icon meta-icon-pink">📍</view>
-            <text class="meta-text">{{item.location}}</text>
-          </view>
+        <view class="meta-row" wx:if="{{item.source}}">
+          <text class="meta-label">来源</text>
+          <text class="meta-value">{{item.source}}</text>
         </view>
-        <view class="event-actions">
-          <view wx:if="{{item.newsUrl}}" class="btn-primary event-btn" bindtap="openNews" data-url="{{item.newsUrl}}">
-            查看来源
-          </view>
-          <view wx:else class="btn-disabled">暂无链接</view>
-        </view>
+      </view>
+      <view class="event-actions">
+        <view wx:if="{{item.newsUrl}}" class="btn-ghost" bindtap="copyLink" data-url="{{item.newsUrl}}">复制来源链接</view>
+        <view wx:else class="btn-plain">暂无公开链接</view>
       </view>
     </view>
+  </view>
+
+  <view class="source-note" wx:if="{{!loading && events.length > 0}}">
+    票务信息以官方渠道为准{{dataSourceLabel ? ' · ' + dataSourceLabel : ''}}
   </view>
 </view>

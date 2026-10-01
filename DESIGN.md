@@ -1,127 +1,59 @@
-# 嘉期如梦 - 设计规范
+# 嘉期如梦 - 设计规范 v2
 
-## 设计理念
+对齐 Web 版 DESIGN-DOC v2.0（Apple.com 式极简），小程序端同源实现。
 
-### 目标用户
-追星人群（任嘉伦粉丝），偏好：
-- 清新梦幻的视觉风格
-- 液态玻璃质感
-- 精致细腻的细节处理
-- 有呼吸感的布局
+## 设计原则
 
-### 设计关键词
-- 液态玻璃（Liquid Glass）
-- 薰衣草紫
-- 大圆角
-- 半透明卡片
-- 渐变背景
+- 白/浅灰实底分段，无玻璃拟态、无渐变、无扫光
+- 发丝线分隔（1rpx #D2D2D7），大留白
+- 系统字体栈，正文 28rpx，行高 1.5+
+- 语义色只用于徽章/圆点等小面积点缀，正文黑白灰
 
-## 色彩系统
+## 色板（与 Web src/index.css @theme 同源）
 
-### 主色调
+| 令牌 | 值 | 用途 |
+|---|---|---|
+| --bg | #ffffff | 页面背景 |
+| --surface | #f5f5f7 | 浅灰分段背景/选中态 |
+| --surface-deep | #e8e8ed | 按钮态/骨架深一档 |
+| --text | #1d1d1f | 主文字 |
+| --text-2 | #6e6e73 | 次级文字 |
+| --text-3 | #86868b | 弱化文字 |
+| --hairline | #d2d2d7 | 发丝分隔线 |
+| --link | #0066cc | 文本链接 |
+| --btn | #0071e3 | 主按钮/选中 tab |
 
-| 名称 | 色值 | 用途 |
-|------|------|------|
-| 薰衣草紫 | #C084FC | 主按钮、导航栏、重点元素 |
-| 浅紫 | #D8B4FE | 次要元素、图标 |
-| 淡紫 | #FAF5FF | 背景、卡片 |
+## 行程类型色（降饱和、白底可读）
 
-### 辅助色
+| 类型 | 色值 | 徽章类 |
+|---|---|---|
+| 影视拍摄 filming | #5856d6 | .badge-filming |
+| 综艺录制 variety | #248a3d | .badge-variety |
+| 商务活动 business | #b45309 | .badge-business |
+| 演出活动 fanmeeting | #d6336c | .badge-fanmeeting |
+| 未知类型 | #6e6e73 | .badge-default |
 
-| 名称 | 色值 | 用途 |
-|------|------|------|
-| 天蓝 | #60A5FA | 强调、装饰 |
-| 浅蓝 | #DBEAFE | 背景、徽章 |
+类型色有配套 `.dot-*` 圆点类，用于月历格子与统计行。
 
-### 功能色
+## 结构约定
 
-| 名称 | 色值 | 用途 |
-|------|------|------|
-| 清新绿 | #34D399 | 成功、确认 |
-| 温暖橙 | #FBBF24 | 警告、提示 |
-| 天空蓝 | #60A5FA | 信息、链接 |
+- 页面骨架：`page-header`（48rpx 大标题 + 26rpx 灰副标）→ 内容段 → `source-note` 数据来源说明
+- 卡片：白底 + 发丝边框 + 20rpx 圆角（`.card`）；灰底无边框变体 `.card-tinted`
+- 列表：白底通栏 + 发丝分隔（news），或卡片堆叠（schedule/events/travel）
+- 官方标记：`.badge-official` 蓝描边小徽章
+- 空态：emoji 图标 + 一句主文案 + 一句副文案，居中
+- 首页 hero：大号「嘉期如梦」（72rpx/700）+ 日期 + 灰色副标，无图片
 
-### 中性色
+## tabBar
 
-| 名称 | 色值 | 用途 |
-|------|------|------|
-| 主要文字 | #1E1B4B | 标题、正文 |
-| 次要文字 | #4B5563 | 说明、描述 |
-| 辅助文字 | #9CA3AF | 时间、来源 |
-| 页面背景 | 渐变 | 整体背景 |
-| 卡片背景 | rgba(255,255,255,0.6) | 卡片、弹窗 |
+- 图标：81×81 PNG，描边风（脚本 `scripts/gen-icons.py` 生成）
+- 未选中 #86868B，选中 #0071E3
+- 文字：未选中 #86868B，选中 #0071E3
 
-## 间距系统
+## 交互约定
 
-```css
---space-xs: 8rpx;   /* 4px */
---space-sm: 16rpx;  /* 8px */
---space-md: 24rpx;  /* 12px */
---space-lg: 32rpx;  /* 16px */
---space-xl: 48rpx;  /* 24px */
-```
-
-## 圆角系统
-
-```css
---radius-sm: 12rpx;   /* 小按钮、标签 */
---radius-md: 20rpx;   /* 输入框 */
---radius-lg: 28rpx;   /* 大卡片 */
---radius-xl: 36rpx;   /* 主卡片、弹窗 */
---radius-full: 999rpx; /* 胶囊按钮 */
-```
-
-## 阴影系统
-
-```css
---shadow-sm: 0 4rpx 16rpx rgba(139, 92, 246, 0.06);
---shadow-md: 0 8rpx 32rpx rgba(139, 92, 246, 0.08);
---shadow-lg: 0 16rpx 48rpx rgba(139, 92, 246, 0.1);
-```
-
-## 组件规范
-
-### 卡片（液态玻璃）
-```css
-.card {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 36rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.06);
-}
-```
-
-### 按钮
-```css
-.btn-primary {
-  background: linear-gradient(135deg, #C084FC, #A855F7);
-  border-radius: 36rpx;
-  box-shadow: 0 8rpx 24rpx rgba(168, 85, 247, 0.3);
-}
-```
-
-### 徽章
-```css
-.badge {
-  border-radius: 28rpx;
-  font-weight: 500;
-}
-.badge-purple { background: rgba(168, 85, 247, 0.1); color: #A855F7; }
-.badge-pink { background: rgba(236, 72, 153, 0.1); color: #EC4899; }
-.badge-green { background: rgba(16, 185, 129, 0.1); color: #34D399; }
-.badge-orange { background: rgba(245, 158, 11, 0.1); color: #FBBF24; }
-```
-
-## 动画效果
-
-- **fadeInUp**: 淡入上移（0.5s）
-- **scaleIn**: 缩放弹入（0.3s）
-- **shimmer**: 骨架屏闪烁（1.5s）
-- **twinkle**: 星星闪烁（2s）
-
-## 与 Web 版统一
-
-- 相同的薰衣草紫主色调
-- 相同的圆角系统（28-36rpx）
-- 相同的中性色体系
-- 相同的渐变背景风格
+- 外部链接：一律 `wx.setClipboardData` 复制 + toast 提示浏览器打开（个人主体无 web-view）
+- 城市未知（数据管道「待定」）：统一显示「城市待定」，购票链接返回空串并渲染提示，绝不产出死链
+- 下拉刷新：所有数据页支持
+- 分享：所有页面 `onShareAppMessage`
+- 反馈：首页底部 `button open-type="feedback"`

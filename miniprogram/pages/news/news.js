@@ -1,21 +1,25 @@
+const api = require('../../utils/api')
 const app = getApp()
 
 Page({
   data: {
     artistName: '任嘉伦',
     news: [],
+    allNews: [],
+    total: 0,
+    officialCount: 0,
+    filter: 'all',
     loading: true,
-    total: 0
+    loadFailed: false,
+    dataSourceLabel: ''
   },
 
-  onLoad: function() {
-    this.setData({
-      artistName: app.globalData.artistName
-    })
+  onLoad() {
+    this.setData({ artistName: app.globalData.artistName })
     this.getNews()
   },
 
-  onPullDownRefresh: function() {
+  onPullDownRefresh() {
     this.getNews()
     wx.stopPullDownRefresh()
   },
@@ -23,46 +27,60 @@ Page({
   async getNews() {
     this.setData({ loading: true })
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getNews'
-      })
-
+      const res = await api.fetchNews()
+      const allNews = (res.data || []).map((it, i) => Object.assign({}, it, {
+        key: it.url || i,
+        isOfficial: Boolean(it.official)
+      }))
       this.setData({
-        news: res.result.data || [],
-        total: (res.result.data || []).length,
-        loading: false
+        allNews,
+        officialCount: allNews.filter(n => n.isOfficial).length,
+        total: res.total || allNews.length,
+        loading: false,
+        loadFailed: false,
+        dataSourceLabel: api.sourceLabel(res.source)
       })
+      this.applyFilter()
     } catch (err) {
-      console.error('获取新闻失败:', err)
-      this.setData({ loading: false })
-      wx.showToast({
-        title: '获取新闻失败',
-        icon: 'none'
-      })
+      console.error('获取动态失败:', err)
+      this.setData({ loading: false, loadFailed: true })
     }
   },
 
-  refreshNews: function() {
+  applyFilter() {
+    const { allNews, filter } = this.data
+    const news = filter === 'official'
+      ? allNews.filter(n => n.isOfficial)
+      : allNews
+    this.setData({ news })
+  },
+
+  setFilter(e) {
+    const filter = e.currentTarget.dataset.filter
+    if (filter === this.data.filter) return
+    this.setData({ filter })
+    this.applyFilter()
+  },
+
+  refreshNews() {
     this.getNews()
-    wx.showToast({
-      title: '正在刷新...',
-      icon: 'loading',
-      duration: 1000
+  },
+
+  copyLink(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    wx.setClipboardData({
+      data: url,
+      success() {
+        wx.showToast({ title: '链接已复制，可在浏览器打开', icon: 'none' })
+      }
     })
   },
 
-  openNews: function(e) {
-    const url = e.currentTarget.dataset.url
-    if (url) {
-      wx.setClipboardData({
-        data: url,
-        success: () => {
-          wx.showToast({
-            title: '链接已复制到剪贴板',
-            icon: 'success'
-          })
-        }
-      })
+  onShareAppMessage() {
+    return {
+      title: '嘉期如梦 · 官方动态',
+      path: '/pages/news/news'
     }
   }
 })

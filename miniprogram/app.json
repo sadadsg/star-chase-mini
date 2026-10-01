@@ -7,10 +7,10 @@
     "pages/travel/travel"
   ],
   "tabBar": {
-    "color": "#B8B0C8",
-    "selectedColor": "#C084FC",
+    "color": "#86868B",
+    "selectedColor": "#0071E3",
     "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -20,13 +20,13 @@
       },
       {
         "pagePath": "pages/news/news",
-        "text": "新闻",
+        "text": "动态",
         "iconPath": "images/news.png",
         "selectedIconPath": "images/news-active.png"
       },
       {
         "pagePath": "pages/schedule/schedule",
-        "text": "行程",
+        "text": "日历",
         "iconPath": "images/schedule.png",
         "selectedIconPath": "images/schedule-active.png"
       },
@@ -39,11 +39,11 @@
     ]
   },
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#C084FC",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "嘉期如梦",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#EDE9FE"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F5F5F7"
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",

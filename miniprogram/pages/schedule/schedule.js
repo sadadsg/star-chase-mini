@@ -1,5 +1,6 @@
+const api = require('../../utils/api')
 const app = getApp()
-const { getDateInfo, getTypeInfo } = require('../../utils/util')
+const { getTypeInfo, typeClasses, cityText, timeText } = require('../../utils/util')
 
 Page({
   data: {
@@ -13,54 +14,62 @@ Page({
     selectedDate: null,
     selectedSchedule: [],
     stats: { filming: 0, variety: 0, business: 0, fanmeeting: 0 },
-    loading: true
+    loading: true,
+    loadFailed: false,
+    dataSourceLabel: ''
   },
 
-  onLoad: function() {
-    this.setData({
-      artistName: app.globalData.artistName
-    })
+  onLoad() {
+    this.setData({ artistName: app.globalData.artistName })
     this.getSchedule()
   },
 
-  onPullDownRefresh: function() {
+  onPullDownRefresh() {
     this.getSchedule()
     wx.stopPullDownRefresh()
   },
 
   async getSchedule() {
+    this.setData({ loading: true })
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getSchedule'
+      const res = await api.fetchSchedule()
+      const schedule = (res.data || [])
+        .filter(it => it.date)
+        .map(it => this.decorate(it))
+      this.setData({
+        schedule,
+        loading: false,
+        loadFailed: false,
+        dataSourceLabel: api.sourceLabel(res.source)
       })
-
-      const schedule = (res.result.data || []).map(item => {
-        const typeInfo = getTypeInfo(item.type)
-        return {
-          ...item,
-          dotClass: item.type === 'filming' ? 'dot-blue' : 
-                    item.type === 'variety' ? 'dot-green' : 
-                    item.type === 'business' ? 'dot-orange' : 'dot-pink',
-          badgeClass: item.type === 'filming' ? 'badge-blue' : 
-                      item.type === 'variety' ? 'badge-green' : 
-                      item.type === 'business' ? 'badge-orange' : 'badge-pink'
-        }
-      })
-
-      this.setData({ schedule, loading: false })
       this.updateMonthSchedule()
     } catch (err) {
       console.error('获取行程失败:', err)
-      this.setData({ loading: false })
+      this.setData({ loading: false, loadFailed: true })
     }
+  },
+
+  decorate(it) {
+    const classes = typeClasses(it.type)
+    return Object.assign({}, it, {
+      key: it.postId || `${it.date}-${it.title}`,
+      time: timeText(it.time),
+      rawTime: it.time,
+      isAllDay: !it.time || it.time === '全天',
+      city: cityText(it.city),
+      rawCity: it.city,
+      typeName: it.typeName || getTypeInfo(it.type).label,
+      badgeClass: classes.badgeClass,
+      dotClass: classes.dotClass
+    })
   },
 
   updateMonthSchedule() {
     const { year, month, schedule } = this.data
     const prefix = `${year}-${String(month).padStart(2, '0')}`
-    
+
     const monthSchedule = schedule.filter(s => s.date && s.date.startsWith(prefix))
-    
+
     const stats = { filming: 0, variety: 0, business: 0, fanmeeting: 0 }
     monthSchedule.forEach(s => {
       if (stats[s.type] !== undefined) stats[s.type]++
@@ -76,25 +85,24 @@ Page({
     const daysInMonth = new Date(year, month, 0).getDate()
     const today = new Date()
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-    
+
     const days = []
-    
-    // 填充空白
+    let idx = 0
+
     for (let i = 0; i < firstDay; i++) {
-      days.push({ isEmpty: true })
+      days.push({ idx: idx++, isEmpty: true })
     }
-    
-    // 填充日期
+
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
       const events = schedule.filter(s => s.date === dateStr)
-      
       days.push({
+        idx: idx++,
         day: d,
         date: dateStr,
         isToday: dateStr === todayStr,
         isSelected: dateStr === this.data.selectedDate,
-        events: events
+        events
       })
     }
 
@@ -105,51 +113,49 @@ Page({
     const { day, date } = e.currentTarget.dataset
     if (!day) return
 
-    const selectedDate = this.data.selectedDate === date ? null : date
-    const selectedSchedule = selectedDate 
-      ? this.data.schedule.filter(s => s.date === selectedDate)
-      : []
+    if (this.data.selectedDate === date) {
+      this.setData({ selectedDate: null, selectedSchedule: [] })
+      this.buildCalendar()
+      return
+    }
 
-    this.setData({ selectedDate, selectedSchedule })
+    const selectedSchedule = this.data.schedule
+      .filter(s => s.date === date)
+      .sort((a, b) => (a.rawTime || '').localeCompare(b.rawTime || ''))
+
+    this.setData({ selectedDate: date, selectedSchedule })
     this.buildCalendar()
   },
 
   prevMonth() {
     let { year, month } = this.data
-    if (month === 1) {
-      year--
-      month = 12
-    } else {
-      month--
-    }
+    if (month === 1) { year--; month = 12 } else { month-- }
     this.setData({ year, month, selectedDate: null, selectedSchedule: [] })
     this.updateMonthSchedule()
   },
 
   nextMonth() {
     let { year, month } = this.data
-    if (month === 12) {
-      year++
-      month = 1
-    } else {
-      month++
-    }
+    if (month === 12) { year++; month = 1 } else { month++ }
     this.setData({ year, month, selectedDate: null, selectedSchedule: [] })
     this.updateMonthSchedule()
   },
 
   copyLink(e) {
     const url = e.currentTarget.dataset.url
-    if (url) {
-      wx.setClipboardData({
-        data: url,
-        success: () => {
-          wx.showToast({
-            title: '链接已复制',
-            icon: 'success'
-          })
-        }
-      })
+    if (!url) return
+    wx.setClipboardData({
+      data: url,
+      success() {
+        wx.showToast({ title: '链接已复制', icon: 'success' })
+      }
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '嘉期如梦 · 行程日历',
+      path: '/pages/schedule/schedule'
     }
   }
 })

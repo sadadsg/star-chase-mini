@@ -1,384 +1,172 @@
-/* 行程日历页面样式 - 液态玻璃风格 */
+/* 行程日历 — Apple 式极简 */
 
-.page-header {
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-md);
+.calendar-card {
+  margin-top: 24rpx;
+  padding: 28rpx 24rpx;
 }
 
-.page-title {
-  display: block;
-  font-size: 40rpx;
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx;
+}
+
+.cal-month {
+  font-size: 32rpx;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 2rpx;
+  color: var(--text);
 }
 
-.page-desc {
-  display: block;
-  font-size: 26rpx;
-  color: var(--text-tertiary);
+.cal-nav {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: var(--text-2);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+/* 当月分类统计 */
+.cal-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24rpx;
+  padding: 0 8rpx;
+}
+
+.cal-stat {
+  display: flex;
+  align-items: center;
+  font-size: 22rpx;
+  color: var(--text-2);
+}
+
+.cal-stat .dot {
+  margin-right: 8rpx;
+}
+
+/* 星期行 */
+.cal-weekdays {
+  display: flex;
+  margin-top: 28rpx;
+}
+
+.cal-weekday {
+  flex: 1;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+/* 日期网格 */
+.cal-grid {
+  display: flex;
+  flex-wrap: wrap;
   margin-top: 8rpx;
 }
 
-/* 月份导航 */
-.month-nav {
+.cal-day {
+  width: 14.28%;
+  height: 92rpx;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-lg);
-  padding: var(--space-md);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-}
-
-.nav-btn {
-  width: 72rpx;
-  height: 72rpx;
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
-  background: rgba(168, 85, 247, 0.1);
-  transition: all 0.2s ease;
+  border-radius: 16rpx;
+  box-sizing: border-box;
 }
 
-.nav-btn:active {
-  transform: scale(0.95);
-  background: rgba(168, 85, 247, 0.15);
+.cal-day.is-empty {
+  pointer-events: none;
 }
 
-.nav-icon {
-  font-size: 36rpx;
-  color: var(--primary);
-  font-weight: 600;
+.cal-daynum {
+  font-size: 28rpx;
+  color: var(--text);
 }
 
-.month-title {
-  font-size: 36rpx;
+.cal-day.is-today .cal-daynum {
+  color: var(--btn);
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 2rpx;
 }
 
-/* 月度统计 */
-.month-stats {
+.cal-day.is-selected {
+  background: var(--surface);
+}
+
+.cal-dots {
+  display: flex;
+  margin-top: 6rpx;
+  height: 12rpx;
+}
+
+.cal-dots .dot {
+  width: 10rpx;
+  height: 10rpx;
+  margin: 0 3rpx;
+}
+
+/* 选中日详情 */
+.day-detail {
+  margin-top: 32rpx;
+}
+
+.day-detail-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20rpx;
+}
+
+.day-event {
+  background: var(--surface);
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
+}
+
+.day-event-meta {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
   flex-wrap: wrap;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
+.meta-time {
+  margin-left: 14rpx;
   font-size: 24rpx;
   font-weight: 600;
+  color: var(--link);
 }
 
-.stat-dot {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
-}
-
-.text-purple { color: var(--primary); }
-.text-pink { color: #EC4899; }
-.text-green { color: var(--success); }
-.text-orange { color: var(--warning); }
-
-.stat-dot-purple { background: var(--primary); }
-.stat-dot-pink { background: #EC4899; }
-.stat-dot-green { background: var(--success); }
-.stat-dot-orange { background: var(--warning); }
-
-.stat-total {
+.meta-city {
+  margin-left: 14rpx;
   font-size: 24rpx;
-  color: var(--text-tertiary);
-  margin-left: auto;
+  color: var(--text-2);
 }
 
-/* 日历 */
-.calendar {
-  padding: var(--space-lg);
-  margin-bottom: var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-}
-
-.weekday-header {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-bottom: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1rpx solid var(--border);
-}
-
-.weekday-item {
-  text-align: center;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  padding: 12rpx 0;
-}
-
-.weekday-item:first-child,
-.weekday-item:last-child {
-  color: var(--primary);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8rpx;
-}
-
-.calendar-day {
-  min-height: 100rpx;
-  padding: 8rpx;
-  text-align: center;
-  background: rgba(255,255,255,0.3);
-  border-radius: var(--radius-lg);
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.calendar-day.empty {
-  background: transparent;
-}
-
-.calendar-day.today {
-  background: rgba(168, 85, 247, 0.1);
-  border: 1rpx solid var(--primary-light);
-}
-
-.calendar-day.selected {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  box-shadow: 0 4rpx 16rpx rgba(168, 85, 247, 0.3);
-}
-
-.calendar-day.has-events {
-  background: rgba(255,255,255,0.4);
-  border: 1rpx solid var(--border);
-}
-
-.calendar-day.has-events::after {
-  content: '';
-  position: absolute;
-  bottom: 8rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8rpx;
-  height: 8rpx;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
-.day-number {
+.day-event-title {
+  display: block;
+  margin-top: 14rpx;
   font-size: 28rpx;
-  color: var(--text-primary);
-  font-weight: 500;
+  color: var(--text);
+  line-height: 1.55;
 }
 
-.calendar-day.today .day-number {
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.calendar-day.selected .day-number {
-  color: var(--text-white);
-  font-weight: 700;
-}
-
-.day-events {
-  display: flex;
-  justify-content: center;
-  gap: 4rpx;
-  margin-top: 4rpx;
-}
-
-.event-dot {
-  width: 8rpx;
-  height: 8rpx;
-  border-radius: 50%;
-}
-
-.dot-purple { background: var(--primary); }
-.dot-pink { background: #EC4899; }
-.dot-green { background: var(--success); }
-.dot-orange { background: var(--warning); }
-
-/* 选中日期的行程 */
-.selected-schedule {
-  margin-top: var(--space-lg);
-}
-
-.selected-date-title {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-}
-
-.selected-date-icon {
-  font-size: 24rpx;
-}
-
-.schedule-detail {
-  padding: var(--space-lg);
-  margin-bottom: var(--space-sm);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.schedule-detail::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6rpx;
-  background: linear-gradient(to bottom, var(--primary), #EC4899);
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-md);
-}
-
-.detail-time {
-  font-size: 24rpx;
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  gap: 4rpx;
-}
-
-.detail-title {
+.day-event-source {
   display: block;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12rpx;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
 }
 
-.detail-desc {
-  display: block;
-  font-size: 26rpx;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-  line-height: 1.7;
-}
-
-.detail-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.detail-location {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
+.day-event-link {
+  display: inline-block;
+  margin-top: 16rpx;
   font-size: 24rpx;
-  color: var(--text-tertiary);
-}
-
-.location-icon {
-  font-size: 20rpx;
-}
-
-.detail-link {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  font-size: 24rpx;
-  color: var(--primary);
-  font-weight: 600;
-  background: rgba(168, 85, 247, 0.1);
-  padding: 12rpx 24rpx;
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-}
-
-.detail-link:active {
-  background: rgba(168, 85, 247, 0.15);
-  transform: scale(0.95);
-}
-
-.link-icon {
-  font-size: 20rpx;
-}
-
-/* 无行程提示 */
-.no-schedule {
-  text-align: center;
-  padding: var(--space-xl);
-  margin-top: var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  border: 1rpx dashed var(--border);
-}
-
-.no-schedule-icon {
-  font-size: 64rpx;
-  margin-bottom: var(--space-md);
-  display: block;
-  opacity: 0.5;
-}
-
-.no-schedule-text {
-  font-size: 28rpx;
-  color: var(--text-tertiary);
-  display: block;
-}
-
-/* 图例 */
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-lg);
-  margin-top: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--border);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.legend-dot {
-  width: 20rpx;
-  height: 20rpx;
-  border-radius: 6rpx;
-}
-
-.legend-text {
-  font-size: 24rpx;
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--link);
 }

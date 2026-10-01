@@ -1,124 +1,140 @@
-const app = getApp()
-const { getDateInfo, getTypeInfo } = require('../../utils/util')
+const api = require('../../utils/api')
+const { todayStr, getDateInfo, getTypeInfo, typeClasses, cityText, timeText } = require('../../utils/util')
 
 Page({
   data: {
-    artistName: '任嘉伦',
     siteName: '嘉期如梦',
+    artistName: '任嘉伦',
+    tagline: '官方公开动态聚合',
+    today: '',
     schedule: [],
+    upcomingCount: 0,
+    recentNote: '',
     news: [],
+    newsCount: 0,
+    eventsCount: 0,
     loading: true,
     newsLoading: true,
-    scheduleCount: 0,
-    newsCount: 0,
-    eventCount: 0
+    loadFailed: false,
+    dataSourceLabel: ''
   },
 
-  onLoad: function() {
-    this.setData({
-      artistName: app.globalData.artistName,
-      siteName: app.globalData.siteName
-    })
-    this.getSchedule()
-    this.getNews()
+  onLoad() {
+    this.setData({ today: this.formatToday() })
+    this.loadAll()
   },
 
-  onPullDownRefresh: function() {
-    this.getSchedule()
-    this.getNews()
+  onPullDownRefresh() {
+    this.loadAll()
     wx.stopPullDownRefresh()
   },
 
-  // 获取行程数据
-  async getSchedule() {
+  formatToday() {
+    const info = getDateInfo(todayStr())
+    return `${info.month}月${info.day}日 星期${info.weekday}`
+  },
+
+  loadAll() {
+    this.loadSchedule()
+    this.loadNews()
+    this.loadEventsCount()
+  },
+
+  async loadSchedule() {
+    this.setData({ loading: true })
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getSchedule'
-      })
-
-      const schedule = (res.result.data || []).map(item => {
-        const dateInfo = getDateInfo(item.date)
-        const typeInfo = getTypeInfo(item.type)
-        return {
-          ...item,
-          day: dateInfo.day,
-          month: dateInfo.month,
-          dotClass: item.type === 'filming' ? 'dot-purple' : 
-                    item.type === 'variety' ? 'dot-green' : 
-                    item.type === 'business' ? 'dot-orange' : 'dot-pink',
-          badgeClass: item.type === 'filming' ? 'badge-purple' : 
-                      item.type === 'variety' ? 'badge-green' : 
-                      item.type === 'business' ? 'badge-orange' : 'badge-pink'
-        }
-      })
-
+      const res = await api.fetchSchedule()
+      const today = todayStr()
+      const all = (res.data || [])
+        .filter(it => it.date)
+        .map(it => this.decorate(it))
+      const upcoming = all
+        .filter(it => it.date >= today)
+        .sort((a, b) => (a.date + (a.rawTime || '')).localeCompare(b.date + (b.rawTime || '')))
+        .slice(0, 7)
+      const recent = all
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 3)
       this.setData({
-        schedule: schedule.slice(0, 5),
-        scheduleCount: schedule.length,
-        loading: false
+        schedule: upcoming.length ? upcoming : recent,
+        upcomingCount: upcoming.length,
+        recentNote: upcoming.length ? '' : '近期暂无新行程，以下为最近收录',
+        loading: false,
+        loadFailed: false,
+        dataSourceLabel: api.sourceLabel(res.source)
       })
     } catch (err) {
       console.error('获取行程失败:', err)
-      this.setData({ loading: false })
+      this.setData({ loading: false, loadFailed: true, schedule: [] })
     }
   },
 
-  // 获取新闻数据
-  async getNews() {
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'getNews'
-      })
+  decorate(it) {
+    const info = getDateInfo(it.date)
+    const classes = typeClasses(it.type)
+    return Object.assign({}, it, {
+      key: it.postId || `${it.date}-${it.title}`,
+      month: info.month,
+      day: info.day,
+      weekday: `周${info.weekday}`,
+      typeName: it.typeName || getTypeInfo(it.type).label,
+      city: cityText(it.city),
+      rawTime: it.time,
+      time: timeText(it.time),
+      isAllDay: !it.time || it.time === '全天',
+      badgeClass: classes.badgeClass,
+      dotClass: classes.dotClass
+    })
+  },
 
-      const news = res.result.data || []
+  async loadNews() {
+    this.setData({ newsLoading: true })
+    try {
+      const res = await api.fetchNews()
+      const news = (res.data || []).slice(0, 3).map((it, i) => Object.assign({}, it, {
+        key: it.url || i,
+        isOfficial: Boolean(it.official)
+      }))
       this.setData({
-        news: news.slice(0, 3),
-        newsCount: news.length,
+        news,
+        newsCount: res.total || (res.data || []).length,
         newsLoading: false
       })
     } catch (err) {
-      console.error('获取新闻失败:', err)
+      console.error('获取动态失败:', err)
       this.setData({ newsLoading: false })
     }
   },
 
-  goToSchedule: function() {
-    wx.switchTab({
-      url: '/pages/schedule/schedule'
-    })
+  async loadEventsCount() {
+    try {
+      const res = await api.fetchEvents()
+      this.setData({ eventsCount: (res.data || []).length })
+    } catch (err) {
+      // 计数失败静默，不影响首页主体
+    }
   },
 
-  goToNews: function() {
-    wx.switchTab({
-      url: '/pages/news/news'
-    })
-  },
+  goToSchedule() { wx.switchTab({ url: '/pages/schedule/schedule' }) },
+  goToNews() { wx.switchTab({ url: '/pages/news/news' }) },
+  goToEvents() { wx.navigateTo({ url: '/pages/events/events' }) },
+  goToTravel() { wx.switchTab({ url: '/pages/travel/travel' }) },
 
-  goToTravel: function() {
-    wx.switchTab({
-      url: '/pages/travel/travel'
-    })
-  },
-
-  goToScheduleDetail: function(e) {
-    const id = e.currentTarget.dataset.id
-    wx.switchTab({
-      url: '/pages/schedule/schedule'
-    })
-  },
-
-  openNews: function(e) {
+  copyLink(e) {
     const url = e.currentTarget.dataset.url
-    if (url) {
-      wx.setClipboardData({
-        data: url,
-        success: () => {
-          wx.showToast({
-            title: '链接已复制',
-            icon: 'success'
-          })
-        }
-      })
+    if (!url) return
+    wx.setClipboardData({
+      data: url,
+      success() {
+        wx.showToast({ title: '链接已复制', icon: 'success' })
+      }
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '嘉期如梦 · 任嘉伦官方公开动态',
+      path: '/pages/index/index'
     }
   }
 })

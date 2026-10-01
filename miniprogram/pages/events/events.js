@@ -1,65 +1,70 @@
+const api = require('../../utils/api')
 const app = getApp()
-const { getTypeInfo } = require('../../utils/util')
+const { getTypeInfo, typeClasses, cityText, timeText } = require('../../utils/util')
 
 Page({
   data: {
     artistName: '任嘉伦',
     events: [],
-    loading: true
+    loading: true,
+    loadFailed: false,
+    dataSourceLabel: ''
   },
 
-  onLoad: function() {
-    this.setData({
-      artistName: app.globalData.artistName
-    })
+  onLoad() {
+    this.setData({ artistName: app.globalData.artistName })
     this.getEvents()
   },
 
-  onPullDownRefresh: function() {
+  onPullDownRefresh() {
     this.getEvents()
     wx.stopPullDownRefresh()
   },
 
   async getEvents() {
+    this.setData({ loading: true })
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getEvents'
+      const res = await api.fetchEvents()
+      const events = (res.data || []).map(it => {
+        const classes = typeClasses(it.type)
+        return Object.assign({}, it, {
+          key: it.postId || `${it.date}-${it.title}`,
+          name: it.name || it.title,
+          dateText: it.date ? `${it.date}${it.time && it.time !== '全天' ? ' ' + it.time : ''}` : '',
+          city: cityText(it.city),
+          cityKnown: Boolean(it.city && it.city !== '待定'),
+          typeName: it.typeName || getTypeInfo(it.type).label,
+          badgeClass: classes.badgeClass,
+          dotClass: classes.dotClass
+        })
       })
-
-      const events = (res.result.data || []).map(item => {
-        const typeInfo = getTypeInfo(item.type)
-        return {
-          ...item,
-          name: item.title,
-          venue: item.location,
-          statusText: '查看来源',
-          badgeClass: 'badge-onsale',
-          cover: `https://picsum.photos/seed/event${item.id}/600/400`
-        }
-      })
-
       this.setData({
         events,
-        loading: false
+        loading: false,
+        loadFailed: false,
+        dataSourceLabel: api.sourceLabel(res.source)
       })
     } catch (err) {
       console.error('获取活动失败:', err)
-      this.setData({ loading: false })
+      this.setData({ loading: false, loadFailed: true })
     }
   },
 
-  openNews: function(e) {
+  copyLink(e) {
     const url = e.currentTarget.dataset.url
-    if (url) {
-      wx.setClipboardData({
-        data: url,
-        success: () => {
-          wx.showToast({
-            title: '链接已复制',
-            icon: 'success'
-          })
-        }
-      })
+    if (!url) return
+    wx.setClipboardData({
+      data: url,
+      success() {
+        wx.showToast({ title: '链接已复制，可在浏览器打开', icon: 'none' })
+      }
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '嘉期如梦 · 活动汇总',
+      path: '/pages/events/events'
     }
   }
 })
