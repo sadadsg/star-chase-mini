@@ -1,0 +1,22 @@
+# 微信开发者工具私有配置（个人开发者本地偏好，不入库）
+project.private.config.json
+
+# 依赖
+node_modules/
+miniprogram_npm/
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.sw?
+.DS_Store
+
+# 日志
+*.log
+npm-debug.log*
+
+# AI 工具配置（绝对路径，不入库）
+.claude/
+
+# 临时构建产物（小程序本地开发可能产生）
+miniprogram/.dev/
