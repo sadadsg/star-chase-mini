@@ -115,4 +115,4 @@ deploy.yml 已内置同步步骤（rclone → COS），未配置 secrets 时自�
 - 深色模式（theme.json + 深色令牌，Web 版已有一套 --d-* 色板可移植）
 - 订阅消息行程提醒（GitHub Action 调 subscribeMessage API，一次性订阅制）
 - 纠错投稿表单（云开发或第三方表单）
-- 数据污染治理：当前 schedule 中有 1 条疑似品牌账号混入其他艺人话题的记录（2026-08-12 欧诗漫），上线前在 Web 仓 `data/` 里人工核对一遍
+- 数据污染治理（10-07 部分完成）：小程序包内 `miniprogram/data/{schedule,events}.js` 已删 postId=5331044879303297（2026-08-12 欧诗漫混入任敏话题那条）。**Web 仓 `~/star-chase/data/{schedule,events}.json` 源文件未清理**，下次跑 `node scripts/sync-bundled-data.cjs` 会重新拉回污染。需在 Web 仓 `feat/product-experience` 分支删除同一条后再 sync。⚠️ Web 仓 `feat/product-experience` 当前领先 origin/main 6 个 commit 未 push，建议清理污染后一起 push。
